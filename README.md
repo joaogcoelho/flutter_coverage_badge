@@ -1,8 +1,7 @@
 # flutter_coverage_badge
 
 Flutter Coverage Badge
-[![pub package](https://img.shields.io/badge/pub-0.0.1+1-blueviolet.svg)](https://pub.dev/packages/flutter_coverage_badge)
-![Coverage](https://raw.githubusercontent.com/amondnet/flutter_coverage_badge/master/coverage_badge.svg?sanitize=true)
+![Coverage](https://raw.githubusercontent.com/fernandomoraesvr/flutter_coverage_badge/main/coverage_badge.svg?sanitize=true)
 
 
 ## Getting Started
@@ -11,7 +10,10 @@ Flutter Coverage Badge
 
 ```
 dev_dependencies:
-  flutter_coverage_badge: ^0.0.1+1
+  flutter_coverage_badge:
+    git:
+      url: git@github.com:fernandomoraesvr/flutter_coverage_badge.git
+      ref: main
 ```
 
 ```
@@ -31,10 +33,25 @@ flutter test --coverage
 flutter pub run flutter_coverage_badge
 ```
 
-![Coverage](https://raw.githubusercontent.com/amondnet/flutter_coverage_badge/master/coverage_badge.svg?sanitize=true)
+![Coverage](https://raw.githubusercontent.com/fernandomoraesvr/flutter_coverage_badge/main/coverage_badge.svg?sanitize=true)
 
 ```
 ![Coverage](https://raw.githubusercontent.com/{you}/{repo}/master/coverage_badge.svg?sanitize=true)
+```
+
+### Specify input path
+```
+Default input path: coverage/lcov.info
+
+flutter pub run flutter_coverage_badge -i 'coverage/new_lcov.info'
+```
+### Specify output filename
+```
+The coverage badge output path is always generated at .github/badges, but you can specify a different filename.
+
+Default output filename: coverage_badge.svg
+
+flutter pub run flutter_coverage_badge -o 'coverage.svg'
 
 ```
 

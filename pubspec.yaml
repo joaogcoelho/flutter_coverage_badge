@@ -1,6 +1,6 @@
 name: flutter_coverage_badge
 description: Flutter Coverage Badge
-version: 0.0.2
+version: 0.0.2+1
 homepage: https://github.com/fernandomoraesvr/flutter_coverage_badge
 
 environment:

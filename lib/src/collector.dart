@@ -29,6 +29,8 @@ void generateBadge(
       .replaceAll('{rightLength}', metrics.rightLength.toString())
       .replaceAll('{color}', color.toString())
       .replaceAll('{value}', value.toString());
+  Directory(path.join(packageRoot.path + '/.github/badges'))
+      .createSync(recursive: true);
   File(path.join(packageRoot.path + '/.github/badges',
           outputName ?? 'coverage_badge.svg'))
       .writeAsStringSync(content);

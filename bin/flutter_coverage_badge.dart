@@ -8,10 +8,8 @@ Future main(List<String> args) async {
   final parser = new ArgParser();
 
   parser.addFlag('help', abbr: 'h', help: 'Show usage', negatable: false);
-  parser.addFlag('input',
-      abbr: 'i', help: 'Path of input file', negatable: false);
-  parser.addFlag('output',
-      abbr: 'o', help: 'Name of output file', negatable: false);
+  parser.addOption('input', abbr: 'i', help: 'Path of input file');
+  parser.addOption('output', abbr: 'o', help: 'Name of output file');
   parser.addFlag('badge', help: 'Gernerate badge', defaultsTo: true);
 
   String? path;
@@ -25,11 +23,13 @@ Future main(List<String> args) async {
   }
 
   if (options.wasParsed('input')) {
-    path = parser.findByNameOrAlias('input')?.valueOrDefault('');
+    print('Loading coverage file from: ' + options['input']);
+    path = options['input'];
   }
 
   if (options.wasParsed('output')) {
-    outputName = parser.findByNameOrAlias('output')?.valueOrDefault('');
+    print('Generated badge in: ' + '/.github/badges/' + options['output']);
+    outputName = options['output'];
   }
 
   final lineCoverage =

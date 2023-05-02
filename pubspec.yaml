@@ -11,9 +11,6 @@ executables:
   flutter_coverage_badge:
 
 dependencies:
-  teste:
-    path: "./teste_module"
-
   flutter:
     sdk: flutter
   process_run: ^0.13.0

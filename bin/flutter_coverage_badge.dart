@@ -42,7 +42,9 @@ Future main(List<String> args) async {
   }
 
   if (options.wasParsed('merge_coverages')) {
+    print("Buscando por modulos de microApp...");
     await _mergeCoverages(rootPath: path ?? "./");
+    print("Merge de lcovs realizado com sucesso!");
   }
 
   final lineCoverage = calculateLineCoverage(
@@ -56,61 +58,51 @@ Future<void> _mergeCoverages({
   required String rootPath,
 }) async {
   List<String> modulesPath = await _getModulesPath(rootPath);
-  List<String> contentLcovs = await _getContentLcovToMerge(modulesPath);
+  String contentLcovs = await _getContentLcovsToMerge(modulesPath);
 
-  for (String content in contentLcovs) {
-    print("ADD CONTENT");
-    _appendContentToMainLcov(content, rootPath: rootPath);
-  }
+  await _appendContentToMainLcov(contentLcovs, rootPath: rootPath);
 }
 
 Future<List<String>> _getModulesPath(String rootPath) async {
   List<String> modulesPath = [];
 
-  Completer completer = Completer<List<String>>();
-
   Directory directory = new Directory(rootPath);
   Stream<FileSystemEntity> lister = directory.list();
   Shell shell = Shell();
 
-  lister.listen(
-    (event) async {
-      if (event.path.endsWith("_module")) {
-        print('');
-        print('MODULO: ${event.path}');
-        print('');
-        await shell.run('flutter test ${event.path} --coverage');
-        modulesPath.add(event.path);
-      }
-    },
-    onDone: () => completer.complete(modulesPath),
-  );
+  await for (FileSystemEntity fileSystem in lister) {
+    if (fileSystem.path.endsWith("_module")) {
+      print('Iniciando teste em moludo: ${fileSystem.path}');
+      await shell.run('cd ${fileSystem.path}');
+      await shell.run('flutter test --coverage');
+      await shell.run('cd ..');
 
-  return await completer.future;
+      modulesPath.add(fileSystem.path);
+    }
+  }
+
+  return modulesPath;
 }
 
-Future<List<String>> _getContentLcovToMerge(List<String> modulesPath) async {
-  List<String> contentLcovs = [];
+Future<String> _getContentLcovsToMerge(List<String> modulesPath) async {
+  String contentLcovs = "";
 
   for (var item in modulesPath) {
-    String content = "\n";
+    contentLcovs = "\n";
     String pathModuleLcov = p.absolute(item, 'coverage', 'lcov.info');
 
     await File(pathModuleLcov).readAsString().then((value) {
-      content += "$value";
-      content += "\n";
+      contentLcovs += "$value";
     });
-
-    contentLcovs.add(content);
   }
 
   return contentLcovs;
 }
 
-void _appendContentToMainLcov(
+Future<void> _appendContentToMainLcov(
   String content, {
   required String rootPath,
-}) {
+}) async {
   String pathMainLcov = p.absolute(rootPath, 'coverage', 'lcov.info');
-  File(pathMainLcov).writeAsString(content, mode: FileMode.append);
+  await File(pathMainLcov).writeAsString(content, mode: FileMode.append);
 }

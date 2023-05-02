@@ -16,7 +16,7 @@ double calculateLineCoverage(File lcovReport) {
     }
     return hitLines / totalLines;
   } catch (ex) {
-    print("Erro");
+    print("Erro $ex");
     return 0;
   }
 }

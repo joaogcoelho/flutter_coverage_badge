@@ -42,7 +42,9 @@ Future main(List<String> args) async {
   }
 
   if (options.wasParsed('merge_coverages')) {
+    print("xi1");
     await _mergeCoverages(rootPath: path ?? "./");
+    print("xi");
   }
 
   final lineCoverage = calculateLineCoverage(
@@ -59,7 +61,6 @@ Future<void> _mergeCoverages({
   List<String> contentLcovs = await _getContentLcovToMerge(modulesPath);
 
   for (String content in contentLcovs) {
-    print("ADD CONTENT");
     _appendContentToMainLcov(content, rootPath: rootPath);
   }
 }
@@ -67,33 +68,30 @@ Future<void> _mergeCoverages({
 Future<List<String>> _getModulesPath(String rootPath) async {
   List<String> modulesPath = [];
 
-  Completer completer = Completer<List<String>>();
-
   Directory directory = new Directory(rootPath);
   Stream<FileSystemEntity> lister = directory.list();
   Shell shell = Shell();
 
-  lister.listen(
-    (event) async {
-      if (event.path.endsWith("_module")) {
-        print('');
-        print('MODULO: ${event.path}');
-        print('');
-        await shell.run('flutter test ${event.path} --coverage');
-        modulesPath.add(event.path);
-      }
-    },
-    onDone: () => completer.complete(modulesPath),
-  );
+  await for (FileSystemEntity fileSystem in lister) {
+    if (fileSystem.path.endsWith("_module")) {
+      print('');
+      print('Iniciando teste em moludo: ${fileSystem.path}');
+      print('');
+      await shell.run(
+        'cd ${fileSystem.path} && flutter test --coverage && cd ..',
+      );
+      modulesPath.add(fileSystem.path);
+    }
+  }
 
-  return await completer.future;
+  return modulesPath;
 }
 
 Future<List<String>> _getContentLcovToMerge(List<String> modulesPath) async {
   List<String> contentLcovs = [];
 
   for (var item in modulesPath) {
-    String content = "\n";
+    String content = "";
     String pathModuleLcov = p.absolute(item, 'coverage', 'lcov.info');
 
     await File(pathModuleLcov).readAsString().then((value) {
@@ -107,10 +105,10 @@ Future<List<String>> _getContentLcovToMerge(List<String> modulesPath) async {
   return contentLcovs;
 }
 
-void _appendContentToMainLcov(
+Future<void> _appendContentToMainLcov(
   String content, {
   required String rootPath,
-}) {
+}) async {
   String pathMainLcov = p.absolute(rootPath, 'coverage', 'lcov.info');
-  File(pathMainLcov).writeAsString(content, mode: FileMode.append);
+  await File(pathMainLcov).writeAsString(content, mode: FileMode.append);
 }

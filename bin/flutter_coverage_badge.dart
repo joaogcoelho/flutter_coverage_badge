@@ -72,8 +72,11 @@ Future<List<String>> _getModulesPath(String rootPath) async {
 
   lister.listen(
     (event) async {
-      if (event.path.endsWith("_module") || event.path.startsWith("modulo_")) {
-        await shell.run('''flutter test --coverage''');
+      if (event.path.endsWith("_module")) {
+        print('');
+        print('MODULO: ${event.path}');
+        print('');
+        await shell.run('flutter test ${event.path} --coverage');
         modulesPath.add(event.path);
       }
     },

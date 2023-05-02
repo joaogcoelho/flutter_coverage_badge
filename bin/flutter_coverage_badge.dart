@@ -45,6 +45,7 @@ Future main(List<String> args) async {
     print("Buscando por modulos de microApp...");
     await _mergeCoverages(rootPath: path ?? "./");
     print("Merge de lcovs realizado com sucesso!");
+    return;
   }
 
   final lineCoverage = calculateLineCoverage(
@@ -73,9 +74,10 @@ Future<List<String>> _getModulesPath(String rootPath) async {
   await for (FileSystemEntity fileSystem in lister) {
     if (fileSystem.path.endsWith("_module")) {
       print('Iniciando teste em moludo: ${fileSystem.path}');
-      await shell.run('cd ${fileSystem.path}');
-      await shell.run('flutter test --coverage');
-      await shell.run('cd ..');
+
+      await shell.run(
+        'cd ${fileSystem.path} && flutter test --coverage && cd ..',
+      );
 
       modulesPath.add(fileSystem.path);
     }

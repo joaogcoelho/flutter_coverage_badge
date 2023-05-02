@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:flutter_coverage_badge/flutter_coverage_badge.dart';
 import 'package:path/path.dart' as p;
+import 'package:process_run/process_run.dart';
 
 Future main(List<String> args) async {
   final package = Directory.current;
@@ -67,10 +68,12 @@ Future<List<String>> _getModulesPath(String rootPath) async {
 
   Directory directory = new Directory(rootPath);
   Stream<FileSystemEntity> lister = directory.list();
+  Shell shell = Shell();
 
   lister.listen(
-    (event) {
+    (event) async {
       if (event.path.endsWith("_module")) {
+        await shell.run('''flutter test --coverage''');
         modulesPath.add(event.path);
       }
     },

@@ -42,7 +42,7 @@ Future main(List<String> args) async {
   }
 
   if (options.wasParsed('merge_coverages')) {
-    _mergeCoverages(rootPath: path ?? "./");
+    await _mergeCoverages(rootPath: path ?? "./");
   }
 
   final lineCoverage = calculateLineCoverage(

@@ -58,11 +58,9 @@ Future<void> _mergeCoverages({
   required String rootPath,
 }) async {
   List<String> modulesPath = await _getModulesPath(rootPath);
-  List<String> contentLcovs = await _getContentLcovToMerge(modulesPath);
+  String contentLcovs = await _getContentLcovsToMerge(modulesPath);
 
-  for (String content in contentLcovs) {
-    _appendContentToMainLcov(content, rootPath: rootPath);
-  }
+  await _appendContentToMainLcov(contentLcovs, rootPath: rootPath);
 }
 
 Future<List<String>> _getModulesPath(String rootPath) async {
@@ -87,19 +85,16 @@ Future<List<String>> _getModulesPath(String rootPath) async {
   return modulesPath;
 }
 
-Future<List<String>> _getContentLcovToMerge(List<String> modulesPath) async {
-  List<String> contentLcovs = [];
+Future<String> _getContentLcovsToMerge(List<String> modulesPath) async {
+  String contentLcovs = "";
 
   for (var item in modulesPath) {
-    String content = "";
+    contentLcovs = "\n";
     String pathModuleLcov = p.absolute(item, 'coverage', 'lcov.info');
 
     await File(pathModuleLcov).readAsString().then((value) {
-      content += "$value";
-      content += "\n";
+      contentLcovs += "$value";
     });
-
-    contentLcovs.add(content);
   }
 
   return contentLcovs;

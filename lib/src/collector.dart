@@ -1,18 +1,24 @@
 import 'dart:io';
+
 import 'package:lcov_dart/lcov_dart.dart';
 import 'package:path/path.dart' as path;
 
 double calculateLineCoverage(File lcovReport) {
-  final report = Report.fromCoverage(lcovReport.readAsStringSync());
-  var totalLines = 0;
-  var hitLines = 0;
-  for (final rec in report.records) {
-    for (final line in rec!.lines!.data) {
-      totalLines++;
-      hitLines += (line.executionCount > 0) ? 1 : 0;
+  try {
+    final report = Report.fromCoverage(lcovReport.readAsStringSync());
+    var totalLines = 0;
+    var hitLines = 0;
+    for (final rec in report.records) {
+      for (final line in rec!.lines!.data) {
+        totalLines++;
+        hitLines += (line.executionCount > 0) ? 1 : 0;
+      }
     }
+    return hitLines / totalLines;
+  } catch (ex) {
+    print("Erro");
+    return 0;
   }
-  return hitLines / totalLines;
 }
 
 void generateBadge(
